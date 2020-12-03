@@ -53,7 +53,7 @@ class TrajectoryTest {
                 topology.countTrees(new Point(0, 0), 7, 1),
                 topology.countTrees(new Point(0, 0), 1, 2))
                 .reduce((a, b) -> a * b))
-                        .hasValue(336);
+                        .hasValue(1355323200);
     }
 
     public Topology parse(String filename) throws Exception {
