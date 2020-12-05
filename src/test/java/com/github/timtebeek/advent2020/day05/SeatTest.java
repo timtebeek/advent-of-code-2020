@@ -1,7 +1,6 @@
 package com.github.timtebeek.advent2020.day05;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -84,7 +83,6 @@ class SeatTest {
 }
 
 @Data
-@EqualsAndHashCode
 class Seat {
     final int row, column;
 
