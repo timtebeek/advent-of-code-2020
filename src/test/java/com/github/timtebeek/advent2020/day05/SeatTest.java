@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.stream.IntStream;
@@ -27,7 +28,7 @@ class SeatTest {
 
     })
     void testSample1(String pattern, int row, int column, int id) throws Exception {
-        Seat seat = parse(128, 8, pattern);
+        Seat seat = parsePattern(pattern);
         assertThat(seat).extracting(s -> s.row).isEqualTo(row);
         assertThat(seat).extracting(s -> s.column).isEqualTo(column);
         assertThat(seat).extracting(Seat::id).isEqualTo(id);
@@ -35,53 +36,49 @@ class SeatTest {
 
     @Test
     void testPart1() throws Exception {
-        List<String> patterns = parse("part1.txt");
-        OptionalInt max = patterns.stream().map(pattern -> parse(128, 8, pattern)).mapToInt(Seat::id).max();
+        List<String> patterns = parseFile("part1.txt");
+        OptionalInt max = patterns.stream().map(SeatTest::parsePattern).mapToInt(Seat::id).max();
         assertThat(max).hasValue(850);
     }
 
     @Test
     void testPart2() throws Exception {
-        List<String> patterns = parse("part1.txt");
+        List<String> patterns = parseFile("part1.txt");
         List<Integer> seatids = patterns.stream()
-                .map(pattern -> parse(128, 8, pattern))
+                .map(SeatTest::parsePattern)
                 .mapToInt(Seat::id)
                 .sorted()
                 .boxed()
                 .collect(toList());
-        List<Integer> possible = IntStream.rangeClosed(11, 850).boxed().collect(toList());
+        List<Integer> possible = IntStream.rangeClosed(Collections.min(seatids), Collections.max(seatids))
+                .boxed()
+                .collect(toList());
         possible.removeIf(seatids::contains);
         assertThat(possible).containsOnly(599);
     }
 
-    private List<String> parse(String filename) throws Exception {
+    private List<String> parseFile(String filename) throws Exception {
         Path input = Paths.get(getClass().getResource(filename).toURI());
         return Files.readAllLines(input);
     }
 
-    private static Seat parse(int rows, int columns, String pattern) {
-        int minRow = 0, maxRow = rows;
+    private static Seat parsePattern(String pattern) {
+        return new Seat(
+                partition(pattern.substring(0, 7), 128, 'F'),
+                partition(pattern.substring(7), 8, 'L'));
+    }
 
-        for (int i = 0; i < 7; i++) {
-            int half = (maxRow - minRow) / 2;
-            if (pattern.charAt(i) == 'F') {
-                maxRow -= half;
+    private static int partition(String pattern, int max, int firstHalfChar) {
+        int min = 0;
+        for (char c : pattern.toCharArray()) {
+            int half = (max - min) / 2;
+            if (c == firstHalfChar) {
+                max -= half;
             } else {
-                minRow += half;
+                min += half;
             }
         }
-
-        int minCol = 0, maxCol = columns;
-        for (int i = 7; i < 10; i++) {
-            int half = (maxCol - minCol) / 2;
-            if (pattern.charAt(i) == 'L') {
-                maxCol -= half;
-            } else {
-                minCol += half;
-            }
-        }
-
-        return new Seat(minRow, minCol);
+        return min;
     }
 
 }
