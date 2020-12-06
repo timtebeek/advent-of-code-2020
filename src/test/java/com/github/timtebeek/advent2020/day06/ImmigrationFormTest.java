@@ -20,7 +20,7 @@ class ImmigrationFormTest {
     void testSample1() throws Exception {
         assertThat(parseImmigrationForms("sample1.txt")
                 .map(Stream::of)
-                .map(group1 -> group1.flatMapToInt(String::chars))
+                .map(group -> group.flatMapToInt(String::chars))
                 .mapToLong(group -> group.distinct().count()).sum())
                         .isEqualByComparingTo(11L);
     }
@@ -29,7 +29,7 @@ class ImmigrationFormTest {
     void testPart1() throws Exception {
         assertThat(parseImmigrationForms("part1.txt")
                 .map(Stream::of)
-                .map(group1 -> group1.flatMapToInt(String::chars))
+                .map(group -> group.flatMapToInt(String::chars))
                 .mapToLong(group -> group.distinct().count()).sum())
                         .isEqualByComparingTo(6382L);
     }
@@ -39,7 +39,8 @@ class ImmigrationFormTest {
         assertThat(parseImmigrationForms("sample1.txt")
                 .map(List::of)
                 .mapToLong(ImmigrationFormTest::countAllYesPerGroup)
-                .sum()).isEqualByComparingTo(6L);
+                .sum())
+                        .isEqualByComparingTo(6L);
     }
 
     @Test
@@ -47,15 +48,15 @@ class ImmigrationFormTest {
         assertThat(parseImmigrationForms("part1.txt")
                 .map(List::of)
                 .mapToLong(ImmigrationFormTest::countAllYesPerGroup)
-                .sum()).isEqualByComparingTo(3197L);
+                .sum())
+                        .isEqualByComparingTo(3197L);
     }
 
     private Stream<String[]> parseImmigrationForms(String filename) throws URISyntaxException, IOException {
         Path input = Paths.get(getClass().getResource(filename).toURI());
         String batch = Files.readString(input);
-        Stream<String[]> groups = Stream.of(batch.split("\n\n"))
+        return Stream.of(batch.split("\n\n"))
                 .map(str -> str.split("\n"));
-        return groups;
     }
 
     private static long countAllYesPerGroup(List<String> group) {
