@@ -8,10 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.groupingBy;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ImmigrationFormTest {
@@ -63,7 +63,7 @@ class ImmigrationFormTest {
         return group.stream()
                 .flatMapToInt(String::chars)
                 .boxed()
-                .collect(Collectors.groupingBy(Function.identity()))
+                .collect(groupingBy(identity()))
                 .entrySet()
                 .stream()
                 .filter(kv -> kv.getValue().size() == group.size())
