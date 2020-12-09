@@ -62,10 +62,8 @@ class EncodingTest {
     private static List<Long> generateSums(List<Long> numbers, int preambleLength) {
         List<Long> sums = new ArrayList<>(preambleLength);
         for (int i = 0; i < numbers.size(); i++) {
-            Long x = numbers.get(i);
             for (int j = 0; j < numbers.size(); j++) {
-                Long y = numbers.get(j);
-                sums.add(x + y);
+                sums.add(numbers.get(i) + numbers.get(j));
             }
         }
         return sums;
@@ -74,10 +72,13 @@ class EncodingTest {
     private static long findContiguousSetMinMaxSum(List<Long> numbers, Long firstInvalidNumber) {
         long[] numberArray = numbers.stream().mapToLong(Long::longValue).toArray();
         for (int skip = 0; skip < numberArray.length; skip++) {
-            for (int limit = 0; limit < numberArray.length - skip; limit++) {
+            for (int limit = 1; limit < numberArray.length - skip; limit++) {
                 long[] array = LongStream.of(numberArray).skip(skip).limit(limit).toArray();
-                if (firstInvalidNumber.longValue() == LongStream.of(array).sum()) {
+                long sum = LongStream.of(array).sum();
+                if (firstInvalidNumber.longValue() == sum) {
                     return LongStream.of(array).min().getAsLong() + LongStream.of(array).max().getAsLong();
+                } else if (firstInvalidNumber.longValue() < sum) {
+                    continue;
                 }
             }
         }
