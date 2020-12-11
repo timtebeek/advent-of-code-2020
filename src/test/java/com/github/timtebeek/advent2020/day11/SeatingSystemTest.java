@@ -109,14 +109,6 @@ enum State {
 
     final char chr;
 
-    State flip() {
-        return switch (this) {
-        case FLOOR -> FLOOR;
-        case EMPTY -> OCCUPIED;
-        case OCCUPIED -> EMPTY;
-        };
-    }
-
     static State of(char charAt) {
         return Stream.of(State.values())
                 .filter(s -> s.chr == charAt)
