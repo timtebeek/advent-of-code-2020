@@ -83,10 +83,10 @@ class SeatingSystemTest {
         State[][] copy = deepCopy(map);
         for (int y = 0; y < map[0].length; y++) {
             for (int x = 0; x < map.length; x++) {
-                long countAdjacentSeatsTaken = countAdjacentSeatsTaken(map, x, y);
-                if (map[x][y] == State.EMPTY && countAdjacentSeatsTaken == 0) {
+                long seatsTaken = countAdjacentSeatsTaken(map, x, y);
+                if (map[x][y] == State.EMPTY && seatsTaken == 0) {
                     copy[x][y] = State.OCCUPIED;
-                } else if (map[x][y] == State.OCCUPIED && 4 <= countAdjacentSeatsTaken) {
+                } else if (map[x][y] == State.OCCUPIED && 4 <= seatsTaken) {
                     copy[x][y] = State.EMPTY;
                 }
             }
@@ -130,10 +130,10 @@ class SeatingSystemTest {
         State[][] copy = deepCopy(map);
         for (int y = 0; y < map[0].length; y++) {
             for (int x = 0; x < map.length; x++) {
-                long countAdjacentSeatsTaken = countVisibleSeatsTaken2(map, x, y);
-                if (map[x][y] == State.EMPTY && countAdjacentSeatsTaken == 0) {
+                long seatsTaken = countVisibleSeatsTaken(map, x, y);
+                if (map[x][y] == State.EMPTY && seatsTaken == 0) {
                     copy[x][y] = State.OCCUPIED;
-                } else if (map[x][y] == State.OCCUPIED && 5 <= countAdjacentSeatsTaken) {
+                } else if (map[x][y] == State.OCCUPIED && 5 <= seatsTaken) {
                     copy[x][y] = State.EMPTY;
                 }
             }
@@ -141,7 +141,7 @@ class SeatingSystemTest {
         return copy;
     }
 
-    private static long countVisibleSeatsTaken2(State[][] map, int x, int y) {
+    private static long countVisibleSeatsTaken(State[][] map, int x, int y) {
         return Stream.of(
                 look(map, x, -1, y, -1), look(map, x, 0, y, -1), look(map, x, +1, y, -1),
                 look(map, x, -1, y, 0), /*                    */ look(map, x, +1, y, 0),
