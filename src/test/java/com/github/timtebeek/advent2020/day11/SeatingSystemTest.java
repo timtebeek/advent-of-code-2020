@@ -20,13 +20,25 @@ class SeatingSystemTest {
     @Test
     void testSample1() throws Exception {
         State[][] map = parse("sample1.txt");
-        assertThat(seatsTakenAtEquilibrium(map)).isEqualByComparingTo(37L);
+        assertThat(seatsTakenAtAdjacentEquilibrium(map)).isEqualByComparingTo(37L);
     }
 
     @Test
     void testPart1() throws Exception {
         State[][] map = parse("part1.txt");
-        assertThat(seatsTakenAtEquilibrium(map)).isEqualByComparingTo(2406L);
+        assertThat(seatsTakenAtAdjacentEquilibrium(map)).isEqualByComparingTo(2406L);
+    }
+
+    @Test
+    void testSample2() throws Exception {
+        State[][] map = parse("sample1.txt");
+        assertThat(seatsTakenAtVisibleEquilibrium(map)).isEqualByComparingTo(26L);
+    }
+
+    @Test
+    void testPart2() throws Exception {
+        State[][] map = parse("part1.txt");
+        assertThat(seatsTakenAtVisibleEquilibrium(map)).isEqualByComparingTo(2149L);
     }
 
     private State[][] parse(String filename) throws URISyntaxException, IOException {
@@ -51,10 +63,10 @@ class SeatingSystemTest {
         }
     }
 
-    private static long seatsTakenAtEquilibrium(State[][] map) {
+    private static long seatsTakenAtAdjacentEquilibrium(State[][] map) {
         long taken = countSeatsTaken(map);
         while (true) {
-            map = tick(map);
+            map = tickAdjacent(map);
             long after = countSeatsTaken(map);
             if (taken == after) {
                 return after;
@@ -67,7 +79,7 @@ class SeatingSystemTest {
         return Stream.of(map).flatMap(Stream::of).filter(s -> s == State.OCCUPIED).count();
     }
 
-    private static State[][] tick(State[][] map) {
+    private static State[][] tickAdjacent(State[][] map) {
         State[][] copy = deepCopy(map);
         for (int y = 0; y < map[0].length; y++) {
             for (int x = 0; x < map.length; x++) {
@@ -100,6 +112,60 @@ class SeatingSystemTest {
         return Arrays.stream(matrix)
                 .map(Object[]::clone)
                 .toArray($ -> matrix.clone());
+    }
+
+    private static long seatsTakenAtVisibleEquilibrium(State[][] map) {
+        long taken = countSeatsTaken(map);
+        while (true) {
+            map = tickVisible(map);
+            long after = countSeatsTaken(map);
+            if (taken == after) {
+                return after;
+            }
+            taken = after;
+        }
+    }
+
+    private static State[][] tickVisible(State[][] map) {
+        State[][] copy = deepCopy(map);
+        for (int y = 0; y < map[0].length; y++) {
+            for (int x = 0; x < map.length; x++) {
+                long countAdjacentSeatsTaken = countVisibleSeatsTaken2(map, x, y);
+                if (map[x][y] == State.EMPTY && countAdjacentSeatsTaken == 0) {
+                    copy[x][y] = State.OCCUPIED;
+                } else if (map[x][y] == State.OCCUPIED && 5 <= countAdjacentSeatsTaken) {
+                    copy[x][y] = State.EMPTY;
+                }
+            }
+        }
+        return copy;
+    }
+
+    private static long countVisibleSeatsTaken2(State[][] map, int x, int y) {
+        return Stream.of(
+                look(map, x, -1, y, -1), look(map, x, 0, y, -1), look(map, x, +1, y, -1),
+                look(map, x, -1, y, 0), /*                    */ look(map, x, +1, y, 0),
+                look(map, x, -1, y, +1), look(map, x, 0, y, +1), look(map, x, +1, y, +1))
+                .filter(s -> s == State.OCCUPIED)
+                .count();
+    }
+
+    private static State look(State[][] map, int x, int dx, int y, int dy) {
+        int maxY = map[0].length - 1;
+        int maxX = map.length - 1;
+        x += dx;
+        y += dy;
+        while (0 <= x && x <= maxX &&
+                0 <= y && y <= maxY) {
+            State state = map[x][y];
+            if (state != State.FLOOR) {
+                return state;
+            }
+            x += dx;
+            y += dy;
+        }
+        // Treat the edges as FLOOR
+        return State.FLOOR;
     }
 }
 
