@@ -24,16 +24,12 @@ class ShuttleSearch {
 
     @Test
     void testSample1() throws Exception {
-        var leaveAt = 939;
-        var buslines = parseNotes(NOTES_SAMPLE1);
-        assertThat(findEarliestBusMultipliedByWaitingTime(leaveAt, buslines)).isEqualByComparingTo(295);
+        assertThat(findEarliestBusMultipliedByWaitingTime(939, parseNotes(NOTES_SAMPLE1))).isEqualByComparingTo(295);
     }
 
     @Test
     void testPart1() throws Exception {
-        var leaveAt = 1011416;
-        var buslines = parseNotes(NOTES_PART1);
-        assertThat(findEarliestBusMultipliedByWaitingTime(leaveAt, buslines)).isEqualByComparingTo(4135);
+        assertThat(findEarliestBusMultipliedByWaitingTime(1011416, parseNotes(NOTES_PART1))).isEqualByComparingTo(4135);
     }
 
     private static List<Integer> parseNotes(String notes) {
