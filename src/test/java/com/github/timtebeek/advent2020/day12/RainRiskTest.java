@@ -19,13 +19,13 @@ class RainRiskTest {
     @Test
     void testSample1() throws Exception {
         var map = parse("sample1.txt");
-        assertThat(navigate(map).getManhattanDistance()).isEqualByComparingTo(25);
+        assertThat(navigatePart1(map).getManhattanDistance()).isEqualByComparingTo(25);
     }
 
     @Test
     void testPart1() throws Exception {
         var map = parse("part1.txt");
-        assertThat(navigate(map).getManhattanDistance()).isEqualByComparingTo(2297);
+        assertThat(navigatePart1(map).getManhattanDistance()).isEqualByComparingTo(2297);
     }
 
     private List<String> parse(String filename) throws URISyntaxException, IOException {
@@ -33,7 +33,7 @@ class RainRiskTest {
         return Files.readAllLines(input);
     }
 
-    private static Point navigate(List<String> instructions) {
+    private static Point navigatePart1(List<String> instructions) {
         Point point = new Point(0, 0);
         Direction direction = Direction.E;
         for (String instruction : instructions) {
@@ -47,6 +47,39 @@ class RainRiskTest {
             }
         }
         return point;
+    }
+
+    @Test
+    void testSample2() throws Exception {
+        var map = parse("sample1.txt");
+        assertThat(navigatePart2(map).getManhattanDistance()).isEqualByComparingTo(286);
+    }
+
+    @Test
+    void testPart2() throws Exception {
+        var map = parse("part1.txt");
+        assertThat(navigatePart2(map).getManhattanDistance()).isEqualByComparingTo(89984);
+    }
+
+    private static Point navigatePart2(List<String> instructions) {
+        Point position = new Point(0, 0);
+        Point waypoint = new Point(10, -1);
+        for (String instruction : instructions) {
+            Character action = instruction.charAt(0);
+            Integer value = Integer.valueOf(instruction.substring(1));
+            switch (action) {
+            case 'N', 'E', 'S', 'W' -> waypoint.move(Direction.valueOf("" + action), value);
+            case 'F' -> {
+                for (int i = 0; i < value; i++) {
+                    position.x += waypoint.x;
+                    position.y += waypoint.y;
+                }
+            }
+            case 'L' -> waypoint.rotate(0 - value);
+            case 'R' -> waypoint.rotate(value);
+            }
+        }
+        return position;
     }
 
 }
@@ -65,6 +98,15 @@ class Point {
         }
     }
 
+    void rotate(int degrees) {
+        int turns = (degrees / 90 + 4) % 4;
+        for (int i = 0; i < turns; i++) {
+            int newY = x;
+            x = 0 - y;
+            y = newY;
+        }
+    }
+
     int getManhattanDistance() {
         return Math.abs(x) + Math.abs(y);
     }
@@ -73,9 +115,9 @@ class Point {
 enum Direction {
     N, E, S, W;
 
-    Direction rotate(int value) {
+    Direction rotate(int degrees) {
         return Stream.of(Direction.values())
-                .filter(d -> d.ordinal() == (value / 90 + 4 + ordinal()) % 4)
+                .filter(d -> d.ordinal() == (degrees / 90 + 4 + ordinal()) % 4)
                 .findFirst()
                 .orElseThrow();
     }
