@@ -40,7 +40,7 @@ class RainRiskTest {
             Character action = instruction.charAt(0);
             Integer value = Integer.valueOf(instruction.substring(1));
             switch (action) {
-            case 'N', 'E', 'S', 'W' -> point.move(Direction.valueOf(action), value);
+            case 'N', 'E', 'S', 'W' -> point.move(Direction.valueOf("" + action), value);
             case 'F' -> point.move(direction, value);
             case 'L' -> direction = direction.rotate(0 - value);
             case 'R' -> direction = direction.rotate(value);
@@ -78,15 +78,5 @@ enum Direction {
                 .filter(d -> d.ordinal() == (value / 90 + 4 + ordinal()) % 4)
                 .findFirst()
                 .orElseThrow();
-    }
-
-    static Direction valueOf(Character action) {
-        return switch (action) {
-        case 'N' -> N;
-        case 'E' -> E;
-        case 'S' -> S;
-        case 'W' -> W;
-        default -> throw new IllegalArgumentException("Unexpected value: " + action);
-        };
     }
 }

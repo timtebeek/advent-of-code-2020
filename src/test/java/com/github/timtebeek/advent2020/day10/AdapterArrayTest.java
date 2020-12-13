@@ -82,7 +82,7 @@ class AdapterArrayTest {
         return collect.get(1).size() * collect.get(3).size();
     }
 
-    private long findDistinctArrangements(List<Integer> numbers) {
+    private static long findDistinctArrangements(List<Integer> numbers) {
 //        return naive(numbers);
         return magic(numbers);
     }
