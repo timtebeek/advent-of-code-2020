@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -88,14 +87,7 @@ class ShuttleSearch {
 
     private static Long findFirstTimestampThroughGenerator(Map<Long, Long> constraints, long startAt) {
         long firstBus = constraints.remove(0L);
-        return Stream.generate(new Supplier<Long>() {
-            private long timestamp = startAt;
-
-            @Override
-            public Long get() {
-                return timestamp += firstBus;
-            }
-        })
+        return Stream.iterate(startAt, t -> t + firstBus)
                 .filter(timestamp -> constraints.entrySet().stream()
                         .allMatch(entry -> {
                             Long offset = entry.getKey();
