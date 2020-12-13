@@ -63,14 +63,14 @@ class ShuttleSearch {
     })
     void testSample2(String notes, long expectedTimestamp) {
         var constraints = parseConstraints(notes);
-        assertThat(findFirstTimestamp(constraints, 0)).isEqualByComparingTo(expectedTimestamp);
+        assertThat(findFirstTimestampThroughGenerator(constraints, 0)).isEqualByComparingTo(expectedTimestamp);
     }
 
     @Test
     @Disabled
     void testPart2() {
         var constraints = parseConstraints(NOTES_PART1);
-        assertThat(findFirstTimestamp(constraints, 100000000000000L)).isEqualByComparingTo(-1L);
+        assertThat(findFirstTimestampThroughGenerator(constraints, 100000000000000L)).isEqualByComparingTo(-1L);
     }
 
     private static Map<Long, Long> parseConstraints(String notes) {
@@ -86,7 +86,7 @@ class ShuttleSearch {
         return constraints;
     }
 
-    private static Long findFirstTimestamp(Map<Long, Long> constraints, long startAt) {
+    private static Long findFirstTimestampThroughGenerator(Map<Long, Long> constraints, long startAt) {
         long firstBus = constraints.remove(0L);
         return Stream.generate(new Supplier<Long>() {
             private long timestamp = startAt;
@@ -100,7 +100,7 @@ class ShuttleSearch {
                         .allMatch(entry -> {
                             Long offset = entry.getKey();
                             long bus = entry.getValue();
-                            return (timestamp + offset) % bus == 0;
+                            return timestamp % bus == bus - offset;
                         }))
                 .findFirst()
                 .get();
