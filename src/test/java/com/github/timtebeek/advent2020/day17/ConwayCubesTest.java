@@ -32,48 +32,46 @@ class ConwayCubesTest {
 
     @Test
     void testSample1() {
-        Set<Coordinate> map = parse(SAMPLE1, THREE);
+        Set<Coordinate> map = parse(SAMPLE1);
         Set<Coordinate> endState = cycle(map, 6, THREE);
         assertThat(endState).hasSize(112);
     }
 
     @Test
     void testPart1() {
-        Set<Coordinate> map = parse(PART1, THREE);
+        Set<Coordinate> map = parse(PART1);
         Set<Coordinate> endState = cycle(map, 6, THREE);
         assertThat(endState).hasSize(284);
     }
 
     @Test
     void testSample2() {
-        Set<Coordinate> map = parse(SAMPLE1, FOUR);
+        Set<Coordinate> map = parse(SAMPLE1);
         Set<Coordinate> endState = cycle(map, 6, FOUR);
         assertThat(endState).hasSize(848);
     }
 
     @Test
     void testPart2() {
-        Set<Coordinate> map = parse(PART1, FOUR);
+        Set<Coordinate> map = parse(PART1);
         Set<Coordinate> endState = cycle(map, 6, FOUR);
         assertThat(endState).hasSize(2240);
     }
 
-    private static Set<Coordinate> parse(String slice, Dimensions dimensions) {
+    private static Set<Coordinate> parse(String slice) {
         Set<Coordinate> map = new HashSet<>();
         String[] split = slice.split("\n");
         for (int y = 0; y < split.length; y++) {
             for (int x = 0; x < split[0].length(); x++) {
                 if (split[y].charAt(x) == '#') {
-                    map.add(new Coordinate(x, y, dimensions));
+                    map.add(new Coordinate(x, y));
                 }
             }
         }
-//        Coordinate.print(0, map);
         return map;
     }
 
-    private static Set<Coordinate> cycle(Set<Coordinate> initialState, int cycles,
-            Dimensions dimensions) {
+    private static Set<Coordinate> cycle(Set<Coordinate> initialState, int cycles, Dimensions dimensions) {
         Set<Coordinate> currentState = new HashSet<>(initialState);
         for (int cycle = 0; cycle < cycles; cycle++) {
             currentState = Coordinate.cycleOnce(currentState, dimensions);
@@ -91,38 +89,12 @@ enum Dimensions {
 class Coordinate {
 
     final int x, y, z, w;
-    final Dimensions dimensions;
 
-    public Coordinate(int x, int y, Dimensions dimensions) {
+    public Coordinate(int x, int y) {
         this.x = x;
         this.y = y;
         this.z = 0;
         this.w = 0;
-        this.dimensions = dimensions;
-    }
-
-    private int countActiveNeighbours(Set<Coordinate> state) {
-        int activeNeighbours = 0;
-        for (int otherX = x - 1; otherX <= x + 1; otherX++) {
-            for (int otherY = y - 1; otherY <= y + 1; otherY++) {
-                for (int otherZ = z - 1; otherZ <= z + 1; otherZ++) {
-                    if (dimensions == THREE) {
-                        Coordinate f = new Coordinate(otherX, otherY, otherZ, 0, dimensions);
-                        if (!this.equals(f) && state.contains(f)) {
-                            activeNeighbours++;
-                        }
-                    } else {
-                        for (int otherW = w - 1; otherW <= w + 1; otherW++) {
-                            Coordinate f = new Coordinate(otherX, otherY, otherZ, otherW, dimensions);
-                            if (!this.equals(f) && state.contains(f)) {
-                                activeNeighbours++;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return activeNeighbours;
     }
 
     public static Set<Coordinate> cycleOnce(Set<Coordinate> currentState, Dimensions dimensions) {
@@ -135,14 +107,14 @@ class Coordinate {
             for (int y = min(ys) - 1; y <= max(ys) + 1; y++) {
                 for (int x = min(xs) - 1; x <= max(xs) + 1; x++) {
                     if (dimensions == THREE) {
-                        Coordinate coordinate = new Coordinate(x, y, z, 0, dimensions);
-                        if (coordinateActiveNextCycle(coordinate, currentState)) {
+                        Coordinate coordinate = new Coordinate(x, y, z, 0);
+                        if (coordinateActiveNextCycle(coordinate, currentState, dimensions)) {
                             nextState.add(coordinate);
                         }
                     } else {
                         for (int w = min(ws) - 1; w <= max(ws) + 1; w++) {
-                            Coordinate coordinate = new Coordinate(x, y, z, w, dimensions);
-                            if (coordinateActiveNextCycle(coordinate, currentState)) {
+                            Coordinate coordinate = new Coordinate(x, y, z, w);
+                            if (coordinateActiveNextCycle(coordinate, currentState, dimensions)) {
                                 nextState.add(coordinate);
                             }
                         }
@@ -153,9 +125,34 @@ class Coordinate {
         return nextState;
     }
 
-    static boolean coordinateActiveNextCycle(Coordinate coordinate, Set<Coordinate> state) {
+    private static boolean coordinateActiveNextCycle(Coordinate coordinate, Set<Coordinate> state,
+            Dimensions dimensions) {
         boolean currentlyActive = state.contains(coordinate);
-        int activeNeighbours = coordinate.countActiveNeighbours(state);
+        int activeNeighbours = countActiveNeighbours(coordinate, state, dimensions);
         return currentlyActive && activeNeighbours == 2 || activeNeighbours == 3;
+    }
+
+    private static int countActiveNeighbours(Coordinate c, Set<Coordinate> state, Dimensions dimensions) {
+        int activeNeighbours = 0;
+        for (int otherX = c.x - 1; otherX <= c.x + 1; otherX++) {
+            for (int otherY = c.y - 1; otherY <= c.y + 1; otherY++) {
+                for (int otherZ = c.z - 1; otherZ <= c.z + 1; otherZ++) {
+                    if (dimensions == THREE) {
+                        Coordinate f = new Coordinate(otherX, otherY, otherZ, 0);
+                        if (!c.equals(f) && state.contains(f)) {
+                            activeNeighbours++;
+                        }
+                    } else {
+                        for (int otherW = c.w - 1; otherW <= c.w + 1; otherW++) {
+                            Coordinate f = new Coordinate(otherX, otherY, otherZ, otherW);
+                            if (!c.equals(f) && state.contains(f)) {
+                                activeNeighbours++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return activeNeighbours;
     }
 }
