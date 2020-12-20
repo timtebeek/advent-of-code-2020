@@ -16,16 +16,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ConwayCubesTest {
 
-    private static final String GLIDER = """
-            .#.
-            ..#
-            ###""";
-
     @Test
     void testSample1() {
-        Map<Coordinate, Boolean> map = parse(GLIDER);
+        Map<Coordinate, Boolean> map = parse("""
+                .#.
+                ..#
+                ###""");
         Map<Coordinate, Boolean> endState = cycle(map, 6);
         assertThat(endState).hasSize(112);
+    }
+
+    @Test
+    void testPart1() {
+        Map<Coordinate, Boolean> map = parse("""
+                ##..#.#.
+                ###.#.##
+                ..###..#
+                .#....##
+                .#..####
+                #####...
+                #######.
+                #.##.#.#""");
+        Map<Coordinate, Boolean> endState = cycle(map, 6);
+        assertThat(endState).hasSize(284);
     }
 
     private static Map<Coordinate, Boolean> parse(String slice) {
